@@ -8,9 +8,11 @@ using KSP.UI.Screens;
 
 namespace PatchManager
 {
+    //
+    // Normally I'd put this into it's own file, but since it's small and has no methods, putting it at the top of this file is ok
+    //
     public class PatchInfo
     {
-
         public bool enabled;
         public bool toggle = false;
         public string fname;
@@ -48,8 +50,8 @@ namespace PatchManager
         const string CONFIG_NODENAME = "PatchManager";
 
         string KSP_DIR = KSPUtil.ApplicationRootPath;
-        string DEFAULT_PATCH_DIRECTORY; 
-        
+        string DEFAULT_PATCH_DIRECTORY;
+        public static List<String> installedMods = new List<String>();
 
         private ApplicationLauncherButton Button;
         bool visible = false;
@@ -76,10 +78,39 @@ namespace PatchManager
             Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
 
             Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
-            
-           
+            GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
         }
 
+        public void onTrue()
+        {
+            Log.Info("Opened PatchManager");
+            visible = true;
+            LoadAllPatches();
+        }
+
+        public void onFalse()
+        {
+            Log.Info("Closed PatchManager");
+            visible = false;
+        }
+
+        void ToggleActivation(PatchInfo pi)
+        {
+            pi.toggle = !pi.toggle;
+        }
+
+        private void Destroy(GameScenes scene)
+        {
+            OnDestroy();
+        }
+
+        public void OnDestroy()
+        {
+            ApplicationLauncher.Instance.RemoveModApplication(Button);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Remove(Destroy);
+        }
+
+        #region ButtonStyles
         static GUIStyle bodyButtonStyle = new GUIStyle(HighLogic.Skin.button)
         {
             alignment = TextAnchor.MiddleCenter,
@@ -108,11 +139,7 @@ namespace PatchManager
             fontSize = 12,
             fontStyle = FontStyle.Bold
         };
-
-        void ToggleActivation(PatchInfo pi)
-        {
-            pi.toggle = !pi.toggle;
-        }
+        #endregion
 
         void HideWindow()
         {
@@ -127,8 +154,11 @@ namespace PatchManager
             GUILayout.Label(msg);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-
         }
+
+        //
+        // Need to warn the user to restart KSP
+        //
         void drawRestartWindow(int windowid)
         {
             CenterLine(" ");
@@ -141,6 +171,9 @@ namespace PatchManager
             GUILayout.FlexibleSpace();
         }
 
+        //
+        // Main window 
+        //
         void drawWindow(int windowid)
         {
             GUILayout.BeginHorizontal();
@@ -226,37 +259,19 @@ namespace PatchManager
                 {
                     if (pi.enabled)
                     {
-                        // delete the dest file
+                        // delete the active patch file
                         Log.Info("Deleting patch at: " + s);
                         File.Delete(s);
                     }
                     else
                     {
-                        // Copy the file to the dest
+                        // Copy the file to the dest to make it active
                         Log.Info("Copying patch from: " + KSP_DIR + "/GameData/" + pi.srcPath + "   to: " + s);
                         File.Copy(KSP_DIR + "/GameData/" + pi.srcPath, s);
                     }
                 }
             }
             restartMsg = true;
-        }
-
-        public void Destroy()
-        {
-            ApplicationLauncher.Instance.RemoveModApplication(Button);
-        }
-
-        public void onTrue()
-        {
-            Log.Info("Opened PatchManager");
-            visible = true;
-            LoadAllPatches();
-        }
-
-        public void onFalse()
-        {
-            Log.Info("Closed PatchManager");
-            visible = false;
         }
 
         public void OnGUI()
@@ -332,6 +347,9 @@ namespace PatchManager
             }
         }
 
+        //
+        // Make sure all dependencies are here
+        //
         bool dependenciesOK(PatchInfo pi)
         {
             if (pi.dependencies == null || pi.dependencies.Length == 0)
@@ -357,7 +375,6 @@ namespace PatchManager
             return false;
         }
 
-        public static List<String> installedMods = new List<String>();
         void buildModList()
         {
             Log.Info("buildModList");
