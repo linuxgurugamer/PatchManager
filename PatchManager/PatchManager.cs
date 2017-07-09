@@ -334,20 +334,25 @@ namespace PatchManager
 
         bool dependenciesOK(PatchInfo pi)
         {
+            if (pi.dependencies == null || pi.dependencies.Length == 0)
+                return true;
             List<string> stringList = pi.dependencies.Split(',').ToList();
             // First check to see if it's a DLL
             foreach (var s in stringList)
             {
-                var s1 = s.Trim();
-                Log.Info("Checking for dependency: " + s1);
-                if (hasMod(s1))
-                    return true;
+                if (s != null && s.Length > 0)
+                {
+                    var s1 = s.Trim();
+                    Log.Info("Checking for dependency: " + s1);
+                    if (hasMod(s1))
+                        return true;
 
-                // Now check to see if it's a directory in GameData
-                var s2 = KSP_DIR + "GameData/" + s1;
-                Log.Info("Checking for directory: " + s2);
-                if (Directory.Exists(s2))
-                    return true;
+                    // Now check to see if it's a directory in GameData
+                    var s2 = KSP_DIR + "GameData/" + s1;
+                    Log.Info("Checking for directory: " + s2);
+                    if (Directory.Exists(s2))
+                        return true;
+                }
             }
             return false;
         }
