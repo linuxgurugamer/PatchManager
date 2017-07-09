@@ -182,6 +182,7 @@ namespace PatchManager
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
+                Log.Info("i: " + i.ToString());
                 GUILayout.BeginHorizontal();
                 GUILayout.BeginVertical();
                 GUIStyle gs = bodyButtonStyle;
@@ -201,7 +202,10 @@ namespace PatchManager
 
                 }
 
-                Texture2D Image = GameDatabase.Instance.GetTexture(pi.icon, false);
+
+                Texture2D Image = null;
+                if (pi.icon != null && pi.icon.Length > 0)
+                    Image = GameDatabase.Instance.GetTexture(pi.icon, false);
                 if (Image == null)
                 {
                     Log.Info("No image loaded for button");
@@ -225,12 +229,11 @@ namespace PatchManager
                 GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175 - 38 - 2));
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
-
-                GUILayout.EndVertical();
-                GUILayout.EndScrollView();
-
-                GUILayout.EndHorizontal();
             }
+            GUILayout.EndVertical();
+            GUILayout.EndScrollView();
+
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Apply All", GUILayout.Width(90)))
