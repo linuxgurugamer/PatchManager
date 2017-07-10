@@ -50,6 +50,10 @@ PatchManager looks for config nodes which have the following format:
 		// mod DLL (as show by ModuleManager)
 		//dependencies = 
 
+		// exclusions, this patch is exclusive with these, in other words, don't install this
+		// if a patch listed in the exclusion is installed
+		// exclusions = 
+
 		// Path to icon, if desired.  Can be a flag, but will be shrunken down to a 38x38 image
 		icon = KWRocketry/Flags/KWFlag04
 

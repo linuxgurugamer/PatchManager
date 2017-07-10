@@ -35,7 +35,11 @@ namespace PatchManager
         // mod DLL (as show by ModuleManager)
         public string dependencies;
 
-        // Path to icon, if desirec
+        // exclusions, this patch is exclusive with these, in other words, don't install this
+        // if a patch listed in the exclusion is installed
+        public string exclusions;
+
+        // Path to icon, if desired
         public string icon;
 
         // Author's name, if desired
@@ -62,6 +66,7 @@ namespace PatchManager
         Vector2 fileSelectionScrollPosition = new Vector2();
 
         static List<PatchInfo> availablePatches = new List<PatchInfo>();
+        static List<String> installedPatches = new List<String>();
 
         PatchInfo pi;
 
@@ -208,6 +213,8 @@ namespace PatchManager
                 Texture2D Image = null;
                 if (pi.icon != null && pi.icon.Length > 0)
                     Image = GameDatabase.Instance.GetTexture(pi.icon, false);
+                GUI.enabled = exclusionsOK(pi);
+
                 if (Image == null)
                 {
                     Log.Info("No image loaded for button");
@@ -226,6 +233,7 @@ namespace PatchManager
                 {
                     ToggleActivation(pi);
                 }
+                GUI.enabled = true;
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
                 GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175 - 38 - 2));
@@ -302,6 +310,7 @@ namespace PatchManager
             Log.Info("PatchManager.OnLoad");
             //try {
             availablePatches.Clear();
+            installedPatches.Clear();
             var availableNodes = GameDatabase.Instance.GetConfigNodes(CONFIG_NODENAME);
             if (availableNodes.Count() > 0)
             {
@@ -316,6 +325,7 @@ namespace PatchManager
                     pi.shortDescr = n.GetValue("shortDescr");
                     pi.longDescr = n.GetValue("longDescr");
                     pi.dependencies = n.GetValue("dependencies");
+                    pi.exclusions = n.GetValue("exclusions");
                     pi.icon = n.GetValue("icon");
                     pi.author = n.GetValue("author");
                     pi.destPath = n.GetValue("destPath");
@@ -328,19 +338,19 @@ namespace PatchManager
                     pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
                     bool bd = Directory.Exists(pi.destPath);
+                    string activePatchName = getActivePatchName(pi); ;
                     if (bd)
                     {
                         // check for old style filename, if it's there, rename it with the modname in front
                         string oldName = getActivePatchName(pi, false);
-                        string s = getActivePatchName(pi);
+                        
                         Log.Info("Checking for old name: " + oldName);
                         if (File.Exists(oldName))
                         {
-                            if (!File.Exists(s))
-                                System.IO.File.Move(oldName, s);
+                            if (!File.Exists(activePatchName))
+                                System.IO.File.Move(oldName, activePatchName);
                         }
-//                        string s = pi.destPath + pi.fname;
-                        pi.enabled = File.Exists(s);
+                        pi.enabled = File.Exists(activePatchName);
                     }
                     else
                     {
@@ -350,7 +360,8 @@ namespace PatchManager
                     }
                     pi.toggle = false;
                     Log.Info("pi.enabled: " + pi.enabled.ToString());
-
+                    if (pi.enabled)
+                        installedPatches.Add(activePatchName);
                     if (dependenciesOK(pi))
                         availablePatches.Add(pi);
                     else
@@ -367,10 +378,12 @@ namespace PatchManager
         {
             pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
+            string s;
             if (withModname)
-                return pi.destPath + "/" + pi.modName.Replace(' ','_') + "_" + pi.fname;
-
-            return pi.destPath + "/" + pi.fname;
+                s = pi.destPath + "/" + pi.modName + "_" + pi.fname;
+           else
+                return pi.destPath + "/" + pi.fname;
+            return s.Replace(' ', '_');
         }
 
         //
@@ -400,6 +413,41 @@ namespace PatchManager
                 }
             }
             return false;
+        }
+
+        bool exclusionsOK(PatchInfo pi)
+        {
+            if (pi.exclusions == null || pi.exclusions.Count() == 0)
+                return true;
+            List<string> stringList = pi.exclusions.Split(',').ToList();
+            foreach (var s2 in stringList)
+            {
+                Log.Info("s2: " + s2);
+            }
+            Log.Info("pi.exclusions: " + pi.exclusions);
+            for (int i = 0; i < availablePatches.Count(); i++)
+            {
+                pi = availablePatches[i];
+                // string s = pi.destPath + pi.fname;
+                string s = getActivePatchName(pi);
+                s = s.Substring(s.LastIndexOf('/') + 1);
+                s = s.Substring(0, s.Length - 4);
+                Log.Info("Checking Exclusion: " + s + "   enabled: " + pi.enabled.ToString() + "   toggle: " + pi.toggle.ToString());
+
+                if ((pi.enabled && !pi.toggle) || (!pi.enabled && pi.toggle))
+                {
+                    if (stringList.Contains(s))
+                    {
+                        Log.Info("exclusion found");
+                        return false;
+                    } else
+                    {
+                        Log.Info("stringList does NOT contain [" + s + "]");
+                    }
+                }
+            }
+
+            return true;
         }
 
         void buildModList()

@@ -4,3 +4,6 @@
 0.0.2
 	Updated active file names to avoid name collisions
 	Added code to rename existing files, if any
+
+0.0.3
+	Added ability to have exclusions of other patch files
