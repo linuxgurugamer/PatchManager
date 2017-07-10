@@ -51,7 +51,7 @@ namespace PatchManager
 
         string KSP_DIR = KSPUtil.ApplicationRootPath;
         string DEFAULT_PATCH_DIRECTORY;
-        public static List<String> installedMods = new List<String>();
+        public static List<String> installedMods = null;
 
         private ApplicationLauncherButton Button;
         bool visible = false;
@@ -59,7 +59,7 @@ namespace PatchManager
         Rect windowPosition;
         const int WIDTH = 800;
         const int HEIGHT = 300;
-        Vector2 fileSelectionScrollPosition = new Vector2();        
+        Vector2 fileSelectionScrollPosition = new Vector2();
 
         static List<PatchInfo> availablePatches = new List<PatchInfo>();
 
@@ -68,13 +68,12 @@ namespace PatchManager
         public void Start()
         {
             DEFAULT_PATCH_DIRECTORY = KSP_DIR + "GameData/PatchManager/ActiveMMPatches";
-            buildModList();
             LoadAllPatches();
-            if (!HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow  && (availablePatches == null || availablePatches.Count() == 0))
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
                 return;
 
 
-            windowPosition = new Rect((Screen.width - WIDTH)/2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
+            windowPosition = new Rect((Screen.width - WIDTH) / 2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
             Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
 
             Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
@@ -165,10 +164,12 @@ namespace PatchManager
             CenterLine("The changes you just made by installing/uninstalling one or");
             CenterLine("more patches will not take effect until the game is restarted");
             CenterLine(" ");
+            GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(" Acknowledged ", GUILayout.Width(150), GUILayout.Height(40)))
                 restartMsg = false;
             GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
 
         //
@@ -193,7 +194,8 @@ namespace PatchManager
                         gs = bodyButtonStyleGreen;
                     else
                         gs = bodyButtonStyleRed;
-                } else
+                }
+                else
                 {
                     if (!pi.toggle)
                         gs = bodyButtonStyleRed;
@@ -209,13 +211,13 @@ namespace PatchManager
                 if (Image == null)
                 {
                     Log.Info("No image loaded for button");
-                    Image = new Texture2D(2, 2);
+                    if (GUILayout.Button("", GUILayout.Width(38), GUILayout.Height(38)))
+                        ToggleActivation(pi);
                 }
-
-
-                if (GUILayout.Button(Image, GUILayout.Width(38), GUILayout.Height(38)))
+                else
                 {
-                    ToggleActivation(pi);
+                    if (GUILayout.Button(Image, GUILayout.Width(38), GUILayout.Height(38)))
+                        ToggleActivation(pi);
                 }
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
@@ -279,7 +281,7 @@ namespace PatchManager
 
         public void OnGUI()
         {
-            if ( HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave || HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow)
+            if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave || HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow)
             {
                 if (visible)
                 {
@@ -321,7 +323,7 @@ namespace PatchManager
                         pi.destPath = DEFAULT_PATCH_DIRECTORY;
                     else
                         pi.destPath = KSP_DIR + "GameData/" + pi.destPath;
-                    pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/'));                    
+                    pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/'));
 
                     bool bd = Directory.Exists(pi.destPath);
                     if (bd)
@@ -335,7 +337,7 @@ namespace PatchManager
                         DirectoryInfo di = Directory.CreateDirectory(pi.destPath);
                         // Shouldn't ever happen, but if it does, create the directory
                     }
-                        pi.toggle = false;
+                    pi.toggle = false;
                     Log.Info("pi.enabled: " + pi.enabled.ToString());
 
                     if (dependenciesOK(pi))
@@ -359,8 +361,9 @@ namespace PatchManager
                 return true;
             List<string> stringList = pi.dependencies.Split(',').ToList();
             // First check to see if it's a DLL
-            foreach (var s in stringList)
+            for (int i = 0; i < stringList.Count(); i++)
             {
+                var s = stringList[i];
                 if (s != null && s.Length > 0)
                 {
                     var s1 = s.Trim();
@@ -392,8 +395,11 @@ namespace PatchManager
 
         bool hasMod(string modIdent)
         {
-            if (installedMods.Count == 0)
+            if (installedMods == null)
+            {
+                installedMods = new List<String>();
                 buildModList();
+            }
             return installedMods.Contains(modIdent);
         }
 

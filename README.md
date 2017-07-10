@@ -15,6 +15,11 @@ specific format.
 As of this release, the only mod which supports it (and is an example for other mod
 authors) is the new KW Rocketry Rebalanced mod
 
+When the window is open, lines with text in red are patches which are not enabled, lines
+in green are patches which are enabled.
+
+Note that the changes aren't done until until you click the "Apply All" button
+
 ===================================================================================
 Instructions for Mod authors
 
