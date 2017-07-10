@@ -13,10 +13,10 @@ This mod will do nothing by itself.  It requires a mod to include patches in a
 specific format.
 
 As of this release, the only mod which supports it (and is an example for other mod
-authors) is the new KW Rocketry Rebalanced mod
+authors) is the new KW Rocketry Rebalanced mod.
 
-===================================================================================
 Instructions for Mod authors
+============================
 
 I'll be referring to the KWRocketry Rebalanced mod, so if you have any questions, I
 suggest you first download that and look at it as a working example.
@@ -51,16 +51,15 @@ PatchManager looks for config nodes which have the following format:
 		author = Linuxgurugamer 
 	}
 
-
-patchName			This is the name of the patch.  It should be short but descriptive
-srcPath				Where the patch file is located, relative to the GameData directory.  
-					You MUST include the full file name as well
-shortDescr			A short description of the patch.
-longDescr			A longer description of the patch
-dependencies		What mods this patch is dependent on.  If these aren't installed, 
-					the patch won't be shown.  This is a comma seperated list of mods
-icon				An icon to show, if desired
-Author				Author of the patch
+| key          | value |
+| ---          | --- |
+| patchName    | This is the name of the patch.  It should be short but descriptive. |
+| srcPath      | Where the patch file is located, relative to the GameData directory. You MUST include the full file name as well. |
+| shortDescr   | A short description of the patch. |
+| longDescr    | A longer description of the patch. |
+| dependencies | What mods this patch is dependent on.  If these aren't installed, the patch won't be shown.  This is a comma separated list of mods. |
+| icon         | An icon to show, if desired. |
+| author       | Author of the patch. |
 
 The directory structure is intentionally rigid.  This is done to make sure that patches 
 are found properly, that patches aren't accidently made active, etc.
@@ -100,16 +99,14 @@ I'm referring to when I talk about a mod:
 
 Mod Definition:
 
-	KW is a mod, it has it's own set of patches
-
-	CommunityPatches is a mod, it has it's own set of patches.
-
-	JoesKWPatches is a  mod. it has it's own set of patches
+- KW is a mod, it has it's own set of patches
+- CommunityPatches is a mod, it has it's own set of patches.
+- JoesKWPatches is a  mod. it has it's own set of patches
 
 
 Some final notes:
 
-If there aren't any mod patches available to be installed, the toolbar button will not be displayed
-You can disable the toolbar button in the standard game settings page.
-There is an override which will force the toolbar button to be always shown, regardless of dependencies
-If you install some patches, and then remove a dependency that one or more of those patches depend on, the patch WILL NOT be removed
+- If there aren't any mod patches available to be installed, the toolbar button will not be displayed.
+- You can disable the toolbar button in the standard game settings page.
+- There is an override which will force the toolbar button to be always shown, regardless of dependencies.
+- If you install some patches, and then remove a dependency that one or more of those patches depend on, the patch WILL NOT be removed.
