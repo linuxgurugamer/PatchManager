@@ -1,0 +1,6 @@
+0.0.1.4
+	Initial release
+
+0.0.2
+	Updated active file names to avoid name collisions
+	Added code to rename existing files, if any

@@ -8,11 +8,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{79333E51-0942-48EB-8D63-EE9B5027C7BB}"
 	ProjectSection(SolutionItems) = preProject
 		buildRelease.bat = buildRelease.bat
+		ChangeLog.txt = ChangeLog.txt
 		deploy.bat = deploy.bat
 		License.txt = License.txt
 		PatchManager.version = PatchManager.version
 		README.md = README.md
-		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
 Global

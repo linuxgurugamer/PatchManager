@@ -259,7 +259,8 @@ namespace PatchManager
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
-                string s = pi.destPath + pi.fname;
+                // string s = pi.destPath + pi.fname;
+                string s = getActivePatchName(pi);
                 if (pi.toggle)
                 {
                     if (pi.enabled)
@@ -323,12 +324,22 @@ namespace PatchManager
                         pi.destPath = DEFAULT_PATCH_DIRECTORY;
                     else
                         pi.destPath = KSP_DIR + "GameData/" + pi.destPath;
-                    pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/'));
+                    
+                    pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
                     bool bd = Directory.Exists(pi.destPath);
                     if (bd)
                     {
-                        string s = pi.destPath + pi.fname;
+                        // check for old style filename, if it's there, rename it with the modname in front
+                        string oldName = getActivePatchName(pi, false);
+                        string s = getActivePatchName(pi);
+                        Log.Info("Checking for old name: " + oldName);
+                        if (File.Exists(oldName))
+                        {
+                            if (!File.Exists(s))
+                                System.IO.File.Move(oldName, s);
+                        }
+//                        string s = pi.destPath + pi.fname;
                         pi.enabled = File.Exists(s);
                     }
                     else
@@ -350,6 +361,16 @@ namespace PatchManager
             {
                 Log.Info("PatchManager no loaded configs");
             }
+        }
+
+        string getActivePatchName(PatchInfo pi, bool withModname = true)
+        {
+            pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
+
+            if (withModname)
+                return pi.destPath + "/" + pi.modName.Replace(' ','_') + "_" + pi.fname;
+
+            return pi.destPath + "/" + pi.fname;
         }
 
         //
