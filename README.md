@@ -29,9 +29,9 @@ The following options are available on the Settings page:
 - Always show toolbar button
 - Store active patches in PatchManager folder
 
-| key              | Default | Description |
-| ---              | --- | |
-| Always show toolbar button | Disabled | Show the toolbar button even if no patches are available due to dependencies/exclusions |
+| key                                        | Default  | Description |
+| ---                                        | ---      | --- |
+| Always show toolbar button                 | Disabled | Show the toolbar button even if no patches are available due to dependencies/exclusions |
 | Store active patches in PatchManager folder | Enabled | Selects where the active patches will be stored.  If disabled, will store in the patch's parent mod directory |
 
 If you change where the patches are stored, the mod will move any active patches to the correct location
