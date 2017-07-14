@@ -44,7 +44,55 @@ namespace PatchManager
 
         // Author's name, if desired
         public string author;
+
+        // installedWithMod, if true, then this patch is active when the mod is installed
+        public bool installedWithMod = false;
+
         public string destPath;
+    }
+
+    public class Settings
+    {
+        const string SETTINGSFILE = "PatchManager.cfg";
+        const string NODE = "PatchManager";
+
+        public bool alwaysShow = false;
+        public bool storeActivePatchesInPMFolder = true;
+
+        public void LoadSettings(string path)
+        {
+            Log.Info("LoadSettings, path: " + path + "   settings file: " + SETTINGSFILE);
+            if (System.IO.File.Exists(path + "/" + SETTINGSFILE))
+            {
+                ConfigNode tempNode = ConfigNode.Load(path + "/" + SETTINGSFILE);
+                ConfigNode nodeLoad = tempNode.GetNode(NODE);
+
+                string s = nodeLoad.GetValue("alwaysShow");
+                if (s != null && s.Length > 0)
+                    alwaysShow = Boolean.Parse(s);
+
+                s = nodeLoad.GetValue("storeActivePatchesInPMFolder");
+                if (s != null && s.Length > 0)
+                    storeActivePatchesInPMFolder = Boolean.Parse(s);
+            }
+        }
+        public void SaveSettings(string path)
+        {
+            Log.Info("LoadSettings, path: " + path + "   settings file: " + SETTINGSFILE);
+
+            ConfigNode nodeLoad = new ConfigNode(NODE);
+            nodeLoad.AddValue("alwaysShow", alwaysShow);
+            nodeLoad.AddValue("storeActivePatchesInPMFolder", storeActivePatchesInPMFolder);
+
+            ConfigNode toSave = new ConfigNode("NODE");
+            toSave.AddNode(nodeLoad);
+            if (!System.IO.Directory.Exists(path))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(path);
+            }
+            toSave.Save(path + "/" + SETTINGSFILE);
+
+        }
     }
 
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
@@ -55,6 +103,7 @@ namespace PatchManager
 
         string KSP_DIR = KSPUtil.ApplicationRootPath;
         string DEFAULT_PATCH_DIRECTORY;
+        string CFG_DIR;
         public static List<String> installedMods = null;
 
         private ApplicationLauncherButton Button;
@@ -68,13 +117,19 @@ namespace PatchManager
         static List<PatchInfo> availablePatches = new List<PatchInfo>();
         static List<String> installedPatches = new List<String>();
 
+        Settings settings = new Settings();
+
         PatchInfo pi;
+        
 
         public void Start()
         {
-            DEFAULT_PATCH_DIRECTORY = KSP_DIR + "GameData/PatchManager/ActiveMMPatches";
+            DEFAULT_PATCH_DIRECTORY = "GameData/PatchManager/ActiveMMPatches";
+            CFG_DIR = "GameData/PatchManager/PluginData";
             LoadAllPatches();
-            if (!HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
+            settings.LoadSettings(CFG_DIR);
+
+            if (!settings.alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
                 return;
 
 
@@ -83,6 +138,7 @@ namespace PatchManager
 
             Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
             GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
+            
         }
 
         public void onTrue()
@@ -143,6 +199,7 @@ namespace PatchManager
             fontSize = 12,
             fontStyle = FontStyle.Bold
         };
+        
         #endregion
 
         void HideWindow()
@@ -160,6 +217,38 @@ namespace PatchManager
             GUILayout.EndHorizontal();
         }
 
+
+        void drawSettingsWindow(int windowid)
+        {
+            GUILayout.Space(20);
+            GUILayout.BeginHorizontal();
+            string s = "This overrides the function of the button being hidden if there are no patches due to dependencies:";
+            GUILayout.TextField(s);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            settings.alwaysShow = GUILayout.Toggle(settings.alwaysShow, "Always show toolbar button");
+            GUILayout.EndHorizontal();
+            GUILayout.Space(25);
+            GUILayout.BeginHorizontal();
+            s = "Disable this to store the active patches in the patch's parent mod folder.\nChanging this after installing patches will leave the installed patches where they were installed";
+            GUILayout.TextArea(s);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            settings.storeActivePatchesInPMFolder = GUILayout.Toggle(settings.storeActivePatchesInPMFolder, "Store active patches in PatchManager folder");
+            GUILayout.EndHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("OK", GUILayout.Width(60)))
+            {
+                showSettings = false;
+                settings.SaveSettings(CFG_DIR);
+                CheckPatchLocations();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUI.DragWindow();
+        }
         //
         // Need to warn the user to restart KSP
         //
@@ -175,6 +264,7 @@ namespace PatchManager
                 restartMsg = false;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
+            GUI.DragWindow();
         }
 
         //
@@ -217,14 +307,17 @@ namespace PatchManager
 
                 if (Image == null)
                 {
-                    Log.Info("No image loaded for button");
-                    if (GUILayout.Button("", GUILayout.Width(38), GUILayout.Height(38)))
-                        ToggleActivation(pi);
+                    if (GUILayout.Button("", HighLogic.Skin.label, GUILayout.Width(38), GUILayout.Height(38)))
+                    {
+                        //ToggleActivation(pi);
+                    }
                 }
                 else
                 {
-                    if (GUILayout.Button(Image, GUILayout.Width(38), GUILayout.Height(38)))
-                        ToggleActivation(pi);
+                    if (GUILayout.Button(Image, HighLogic.Skin.label, GUILayout.Width(38), GUILayout.Height(38)))
+                    {
+                        // ToggleActivation(pi);
+                    }
                 }
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
@@ -258,6 +351,10 @@ namespace PatchManager
                 HideWindow();
             }
             GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Settings"))
+            {
+                showSettings = true;
+            }
             GUILayout.EndHorizontal();
             GUI.DragWindow();
         }
@@ -271,28 +368,46 @@ namespace PatchManager
                 string s = getActivePatchName(pi);
                 if (pi.toggle)
                 {
-                    if (pi.enabled)
+                    if (!pi.installedWithMod)
                     {
-                        // delete the active patch file
-                        Log.Info("Deleting patch at: " + s);
-                        File.Delete(s);
+                        if (pi.enabled)
+                        {
+                            // delete the active patch file
+                            Log.Info("Deleting patch at: " + s);
+                            File.Delete(s);
+                        }
+                        else
+                        {
+                            // Copy the file to the dest to make it active
+                            Log.Info("Copying patch from: " + KSP_DIR + "/GameData/" + pi.srcPath + "   to: " + s);
+                            File.Copy(KSP_DIR + "/GameData/" + pi.srcPath, s);
+                        }
                     }
                     else
                     {
-                        // Copy the file to the dest to make it active
-                        Log.Info("Copying patch from: " + KSP_DIR + "/GameData/" + pi.srcPath + "   to: " + s);
-                        File.Copy(KSP_DIR + "/GameData/" + pi.srcPath, s);
+                        if (pi.enabled)
+                        {
+                            // delete the active patch file
+                            Log.Info("Moving patch at: " + s + " to " + KSP_DIR + "/GameData/" + pi.srcPath);
+                            File.Move(s, KSP_DIR + "/GameData/" + pi.srcPath);
+                        }
+                        else
+                        {
+                            // Copy the file to the dest to make it active
+                            Log.Info("Moving patch from: " + KSP_DIR + "/GameData/" + pi.srcPath + "   to: " + s);
+                            File.Move(KSP_DIR + "/GameData/" + pi.srcPath, s);
+                        }
                     }
                 }
             }
             restartMsg = true;
         }
-
+        bool showSettings = false;
         public void OnGUI()
         {
-            if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave || HighLogic.CurrentGame.Parameters.CustomParams<PM>().alwaysShow)
+            if (settings.alwaysShow || (availablePatches != null && availablePatches.Count() > 0))
             {
-                if (visible)
+                if (!showSettings && visible)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
                     windowPosition = GUILayout.Window(windowId, windowPosition, drawWindow, "Patch Manager");
@@ -302,12 +417,17 @@ namespace PatchManager
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
                     windowPosition = GUILayout.Window(windowId, windowPosition, drawRestartWindow, "Restart Message");
                 }
+                if (showSettings)
+                {
+                    int windowId = GUIUtility.GetControlID(FocusType.Native);
+                    windowPosition = GUILayout.Window(windowId, windowPosition, drawSettingsWindow, "Patch Manager Settings");
+                }
             }
         }
 
         void LoadAllPatches()
         {
-            Log.Info("PatchManager.OnLoad");
+            Log.Info("LoadAllPatches");
             //try {
             availablePatches.Clear();
             installedPatches.Clear();
@@ -328,29 +448,63 @@ namespace PatchManager
                     pi.exclusions = n.GetValue("exclusions");
                     pi.icon = n.GetValue("icon");
                     pi.author = n.GetValue("author");
-                    pi.destPath = n.GetValue("destPath");
 
-                    if (pi.destPath == null || pi.destPath == "")
-                        pi.destPath = DEFAULT_PATCH_DIRECTORY;
-                    else
-                        pi.destPath = KSP_DIR + "GameData/" + pi.destPath;
+                    string s = n.GetValue("installedWithMod");
+                    if (s != null && s.Length > 0)
+                        pi.installedWithMod = Boolean.Parse(s);
+
                     
+                    if (!pi.installedWithMod && settings.storeActivePatchesInPMFolder)
+                    {
+                        //if (pi.destPath == null || pi.destPath == "")
+                            pi.destPath = DEFAULT_PATCH_DIRECTORY;
+                        //else
+                        //    pi.destPath = "GameData/" + pi.destPath;
+                    }
+                    else
+                    {
+                        pi.destPath = "GameData/" + pi.srcPath.Replace("PluginData", "ActiveMMPatches");
+                        pi.destPath = pi.destPath.Substring(0, pi.destPath.LastIndexOf('/'));
+                        if (pi.installedWithMod)
+                            Log.Info("installedWithMod: True,  srcPath: " + pi.srcPath + "    destPath: " + pi.destPath);
+                        else
+                            Log.Info("Storing patches in source mod dir,  srcPath: " + pi.srcPath + "    destPath: " + pi.destPath);
+                    }
+
                     pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
-                    bool bd = Directory.Exists(pi.destPath);
+                    bool bd = Directory.Exists(pi.destPath) || File.Exists(pi.destPath);
                     string activePatchName = getActivePatchName(pi); ;
                     if (bd)
                     {
                         // check for old style filename, if it's there, rename it with the modname in front
                         string oldName = getActivePatchName(pi, false);
-                        
-                        Log.Info("Checking for old name: " + oldName);
-                        if (File.Exists(oldName))
+                        if (!pi.installedWithMod)
                         {
-                            if (!File.Exists(activePatchName))
-                                System.IO.File.Move(oldName, activePatchName);
+                            Log.Info("Checking for old name: " + oldName);
+                            if (File.Exists(oldName))
+                            {
+                                if (!File.Exists(activePatchName))
+                                    System.IO.File.Move(oldName, activePatchName);
+                            }
+
+                            Log.Info("Checking for patch in alternative location");
+                            string altPath = getAlternativeActivePatchName(pi);
+                            Log.Info("activePatchName: " + activePatchName + ",   alternativePatchName: " + altPath);
+                            if (File.Exists(altPath))
+                            {
+                                Log.Info("Moving patch to correct location");
+                                System.IO.File.Move(altPath, activePatchName);
+                            }
+
+                            Log.Info("Checking for file: " + activePatchName);
+                            pi.enabled = File.Exists(activePatchName);
                         }
-                        pi.enabled = File.Exists(activePatchName);
+                        else
+                        {
+                            Log.Info("Checking for file: " + oldName);
+                            pi.enabled = File.Exists(oldName);
+                        }
                     }
                     else
                     {
@@ -374,17 +528,50 @@ namespace PatchManager
             }
         }
 
+        void CheckPatchLocations()
+        {
+            Log.Info("CheckPatchLocations");
+            LoadAllPatches();
+        }
+
         string getActivePatchName(PatchInfo pi, bool withModname = true)
         {
             pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
             string s;
-            if (withModname)
+            if (withModname && !pi.installedWithMod && settings.storeActivePatchesInPMFolder)
                 s = pi.destPath + "/" + pi.modName + "_" + pi.fname;
-           else
-                return pi.destPath + "/" + pi.fname;
-            return s.Replace(' ', '_');
+            else
+                s = pi.destPath + "/" + pi.fname;
+            s = s.Replace(' ', '_');
+            return KSP_DIR + s;
         }
+
+        string getAlternativeActivePatchName(PatchInfo pi)
+        {
+            string destPath = "";
+            if (!pi.installedWithMod && !settings.storeActivePatchesInPMFolder)
+            {
+                destPath = DEFAULT_PATCH_DIRECTORY;
+            }
+            else
+            {
+                destPath = "GameData/" + pi.srcPath.Replace("PluginData", "ActiveMMPatches");
+                destPath = destPath.Substring(0, destPath.LastIndexOf('/'));
+            }
+
+
+            pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
+
+            string s;
+            if (!settings.storeActivePatchesInPMFolder)
+                s = destPath + "/" + pi.modName + "_" + pi.fname;
+            else
+                s = destPath + "/" + pi.fname;
+            s = s.Replace(' ', '_');
+            return KSP_DIR + s;
+        }
+
 
         //
         // Make sure all dependencies are here
@@ -440,7 +627,8 @@ namespace PatchManager
                     {
                         Log.Info("exclusion found");
                         return false;
-                    } else
+                    }
+                    else
                     {
                         Log.Info("stringList does NOT contain [" + s + "]");
                     }

@@ -7,3 +7,11 @@
 
 0.0.3
 	Added ability to have exclusions of other patch files
+
+0.0.4
+	Fixed bug where path to KSP directory has spaces
+	Changed first button on line where icon is show to non-functional field, removed button graphics
+	Added new option:  installedWithMod  for patches which need to be initially active
+	Added new settings option to allow active patches to be stored in the parent mod directory
+	Added code to move active patches to the correct directory at load time and if it is changed 
+	Replaced settings page with new setting window, because these options are global to all games, not specific saves

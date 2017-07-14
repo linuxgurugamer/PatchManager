@@ -21,6 +21,21 @@ in green are patches which are enabled.
 Note that the changes aren't done until until you click the "Apply All" button
 
 
+Settings
+--------
+
+The following options are available on the Settings page:
+
+- Always show toolbar button
+- Store active patches in PatchManager folder
+
+| key              | Default | Description |
+| ---              | --- || |
+| Always show toolbar button | Disabled | Show the toolbar button even if no patches are available due to dependencies/exclusions |
+| Store active patches in PatchManager folder | Enabled | Selects where the active patches will be stored.  If disabled, will store in the patch's parent mod directory |
+
+If you change where the patches are stored, the mod will move any active patches to the correct location
+
 Instructions for Mod authors
 ============================
 
@@ -35,6 +50,7 @@ PatchManager looks for config nodes which have the following format:
 		// Required settings.  
 		// srcPath should use forward slashes, and include the full file name.  srcPath should be in a directory 
 		// called ".../PatchManager/PluginData"
+		modname = KW Rocketry
 		patchName = GraduatedPowerResponse
 		srcPath = KWRocketry/PatchManager/PluginData/GraduatedPowerResponse.cfg
 		shortDescr = Graduated Power Response
@@ -59,17 +75,21 @@ PatchManager looks for config nodes which have the following format:
 
 		// Author's name, if desired
 		author = Linuxgurugamer 
+
+		// installedWithMod, if true, then this patch is active when the mod is installed
+		// installedWithMod = true
 	}
 
-| key          | value |
-| ---          | --- |
-| patchName    | This is the name of the patch.  It should be short but descriptive. |
-| srcPath      | Where the patch file is located, relative to the GameData directory. You MUST include the full file name as well. |
-| shortDescr   | A short description of the patch. |
-| longDescr    | A longer description of the patch. |
-| dependencies | What mods this patch is dependent on.  If these aren't installed, the patch won't be shown.  This is a comma separated list of mods. |
-| icon         | An icon to show, if desired. |
-| author       | Author of the patch. |
+| key              | value |
+| ---              | --- |
+| patchName        | This is the name of the patch.  It should be short but descriptive. |
+| srcPath          | Where the patch file is located, relative to the GameData directory. You MUST include the full file name as well. |
+| shortDescr       | A short description of the patch. |
+| longDescr        | A longer description of the patch. |
+| dependencies     | What mods this patch is dependent on.  If these aren't installed, the patch won't be shown.  This is a comma separated list of mods. |
+| icon             | An icon to show, if desired. |
+| author           | Author of the patch. |
+| installedWithMod | If true, then this patch is active when the mod is installed.  See the special instructions below about this option |
 
 The directory structure is intentionally rigid.  This is done to make sure that patches 
 are found properly, that patches aren't accidently made active, etc.
@@ -92,7 +112,7 @@ actual patch file, and recommend that you do so, it isn't absolutely necessary:
 	   |       |
 	   |       |->PluginData/
 	   |       |      |
-	   |       |      |-_GraduatedPowerResponse.cfg				// This is the actual patch file
+	   |       |      |->GraduatedPowerResponse.cfg				// This is the actual patch file
 	   |       |
 	   |       |->PM_GraduatedPowerResponse.cfg					// This is the PatchManager file
 	   |
@@ -112,6 +132,43 @@ Mod Definition:
 - KW is a mod, it has it's own set of patches
 - CommunityPatches is a mod, it has it's own set of patches.
 - JoesKWPatches is a  mod. it has it's own set of patches
+
+Special Instructions regarding the "installedWithMod" option
+============================================================
+Some mods may wish to have patches which are installed and active when the mod is installed.
+This requires special handling:
+
+The patch goes into a different directory called ActiveMMPatches in the initial Patchmanager folder.  
+Internally, the operations are somewhat reversed.  Instead of the patch being copied to the main PatchManager directory, when 
+deactivated the patch will be moved to the local PluginData directory, and back again if reactivated.
+The "srcPath" should still point to the PluginData directory, even though the patch will be in the ActiveMMPatches directory.  In 
+this case, "srcPath" is telling the mod where to move the patch to in order to disable it.  The name of the file will be obtained from this entry.
+
+srcPath = KWRocketry/PatchManager/PluginData/GraduatedPowerResponse.cfg
+
+Using the same diagram as earlier, the new directory layout is:
+
+	KWRocketry
+	   |
+	   |->Flags/
+	   |->KWCommunityFixes/
+	   |->Parts/
+	   |
+	   \->PatchManager/
+	           |
+	           |->ActiveMMPatches/
+	           |      |
+	           |      |->InitialActivePatch.cfg					// This is the actual patch file
+	           |
+	           |->PluginData/
+	           |      |
+	           |      |->GraduatedPowerResponse.cfg				// This is the actual patch file
+	           |
+	           |->PM_InitialActivePatch.cfg						// This is the PatchManager file
+	           |->PM_GraduatedPowerResponse.cfg					// This is the PatchManager file
+	    
+
+
 
 
 Some final notes:
