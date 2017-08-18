@@ -110,8 +110,8 @@ namespace PatchManager
         bool visible = false;
         bool restartMsg = false;
         Rect windowPosition;
-        const int WIDTH = 800;
-        const int HEIGHT = 300;
+        const int WIDTH = 900;
+        const int HEIGHT = 600;
         Vector2 fileSelectionScrollPosition = new Vector2();
 
         static List<PatchInfo> availablePatches = new List<PatchInfo>();
@@ -120,7 +120,6 @@ namespace PatchManager
         Settings settings = new Settings();
 
         PatchInfo pi;
-        
 
         public void Start()
         {
@@ -134,13 +133,20 @@ namespace PatchManager
 
 
             windowPosition = new Rect((Screen.width - WIDTH) / 2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
-            Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
 
-            Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
-            GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
-            
+
+            if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
+            {
+                CreateButton();
+            }
         }
 
+        void CreateButton()
+        {
+            Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
+            Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
+        }
         public void onTrue()
         {
             Log.Info("Opened PatchManager");
@@ -166,8 +172,12 @@ namespace PatchManager
 
         public void OnDestroy()
         {
-            ApplicationLauncher.Instance.RemoveModApplication(Button);
-            GameEvents.onGUIApplicationLauncherUnreadifying.Remove(Destroy);
+            if (Button != null)
+            {
+                ApplicationLauncher.Instance.RemoveModApplication(Button);
+                GameEvents.onGUIApplicationLauncherUnreadifying.Remove(Destroy);
+                Button = null;
+            }
         }
 
         #region ButtonStyles
@@ -199,7 +209,7 @@ namespace PatchManager
             fontSize = 12,
             fontStyle = FontStyle.Bold
         };
-        
+
         #endregion
 
         void HideWindow()
@@ -222,7 +232,11 @@ namespace PatchManager
         {
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            string s = "This overrides the function of the button being hidden if there are no patches due to dependencies:";
+            string s = "This overrides the function of the button being hidden if there are no patches due to dependencies";
+            GUILayout.TextField(s);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            s = "This does not disble/enable the mod, that you can do in the standard settings:";
             GUILayout.TextField(s);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
@@ -230,7 +244,7 @@ namespace PatchManager
             GUILayout.EndHorizontal();
             GUILayout.Space(25);
             GUILayout.BeginHorizontal();
-            s = "Disable this to store the active patches in the patch's parent mod folder.\nChanging this after installing patches will leave the installed patches where they were installed";
+            s = "Disable this to store the active patches in the patch's parent mod folder";
             GUILayout.TextArea(s);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
@@ -267,38 +281,34 @@ namespace PatchManager
             GUI.DragWindow();
         }
 
+        bool expanded = false;
+        string expandedMod;
+
         //
         // Main window 
         //
-        void drawWindow(int windowid)
+        void drawPatchWindow(int windowid)
         {
+            string lastModDisplayed = "";
             GUILayout.BeginHorizontal();
             fileSelectionScrollPosition = GUILayout.BeginScrollView(fileSelectionScrollPosition);
             GUILayout.BeginVertical();
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
-                Log.Info("i: " + i.ToString());
+                Log.Info("i: " + i.ToString() + ",  modname: " + pi.modName);
+
+                if (!expanded && pi.modName == lastModDisplayed)
+                    continue;
+
                 GUILayout.BeginHorizontal();
-                GUILayout.BeginVertical();
                 GUIStyle gs = bodyButtonStyle;
 
-                if (pi.enabled)
-                {
-                    if (!pi.toggle)
-                        gs = bodyButtonStyleGreen;
-                    else
-                        gs = bodyButtonStyleRed;
-                }
-                else
-                {
-                    if (!pi.toggle)
-                        gs = bodyButtonStyleRed;
-                    else
-                        gs = bodyButtonStyleGreen;
+                GUILayout.BeginVertical();
 
-                }
-
+                // Disply Mod Buttons
+                string s = "";
+                //GUILayout.BeginVertical();
 
                 Texture2D Image = null;
                 if (pi.icon != null && pi.icon.Length > 0)
@@ -321,15 +331,57 @@ namespace PatchManager
                 }
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
-
-                if (GUILayout.Button(pi.modName + "\n" + pi.shortDescr, gs, GUILayout.Width(175)))
+                if (!expanded || lastModDisplayed != pi.modName)
                 {
-                    ToggleActivation(pi);
+                    if (GUILayout.Button(pi.modName, GUILayout.Width(175)))
+                    {
+                        if (expanded && expandedMod == pi.modName)
+                            expanded = false;
+                        else
+                            if (!expanded)
+                                expanded = !expanded;
+                        expandedMod = pi.modName;
+                    }
                 }
-                GUI.enabled = true;
+                else
+                    GUILayout.Label(" ", GUILayout.Width(175));
+                lastModDisplayed = pi.modName;
                 GUILayout.EndVertical();
+                // End of Mod button display
+
+
+                GUI.enabled = true;
                 GUILayout.BeginVertical();
-                GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175 - 38 - 2));
+
+                if (expanded && pi.modName == expandedMod )
+                {
+                    if (pi.enabled)
+                    {
+                        if (!pi.toggle)
+                            gs = bodyButtonStyleGreen;
+                        else
+                            gs = bodyButtonStyleRed;
+                    }
+                    else
+                    {
+                        if (!pi.toggle)
+                            gs = bodyButtonStyleRed;
+                        else
+                            gs = bodyButtonStyleGreen;
+                    }
+                    if (GUILayout.Button(pi.shortDescr, gs, GUILayout.Width(175)))
+                    {
+                        ToggleActivation(pi);
+                    }
+                    GUILayout.EndVertical();
+                    GUILayout.BeginVertical();
+                   
+                    GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175*2 - 38 - 2));
+                }
+                else
+                {
+                    GUILayout.Label("\n\n", GUILayout.Width(WIDTH - 175 - 38 - 2));
+                }
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
             }
@@ -402,15 +454,25 @@ namespace PatchManager
             }
             restartMsg = true;
         }
+        private void FixedUpdate()
+        {
+            if (Button == null && HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
+                CreateButton();
+            if (Button != null && !HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
+                OnDestroy();
+        }
+
+
+
         bool showSettings = false;
         public void OnGUI()
         {
-            if (settings.alwaysShow || (availablePatches != null && availablePatches.Count() > 0))
+            if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave && settings.alwaysShow || (availablePatches != null && availablePatches.Count() > 0))
             {
                 if (!showSettings && visible)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawWindow, "Patch Manager");
+                    windowPosition = GUILayout.Window(windowId, windowPosition, drawPatchWindow, "Patch Manager");
                 }
                 if (restartMsg)
                 {
@@ -453,11 +515,11 @@ namespace PatchManager
                     if (s != null && s.Length > 0)
                         pi.installedWithMod = Boolean.Parse(s);
 
-                    
+
                     if (!pi.installedWithMod && settings.storeActivePatchesInPMFolder)
                     {
                         //if (pi.destPath == null || pi.destPath == "")
-                            pi.destPath = DEFAULT_PATCH_DIRECTORY;
+                        pi.destPath = DEFAULT_PATCH_DIRECTORY;
                         //else
                         //    pi.destPath = "GameData/" + pi.destPath;
                     }
