@@ -84,6 +84,7 @@ PatchManager looks for config nodes which have the following format:
 | ---              | --- |
 | patchName        | This is the name of the patch.  It should be short but descriptive. |
 | srcPath          | Where the patch file is located, relative to the GameData directory. You MUST include the full file name as well. |
+|                  | The filename of the patch MUST match the patchName above |
 | shortDescr       | A short description of the patch. |
 | longDescr        | A longer description of the patch. |
 | dependencies     | What mods this patch is dependent on.  If these aren't installed, the patch won't be shown.  This is a comma separated list of mods. |

@@ -15,3 +15,14 @@
 	Added new settings option to allow active patches to be stored in the parent mod directory
 	Added code to move active patches to the correct directory at load time and if it is changed 
 	Replaced settings page with new setting window, because these options are global to all games, not specific saves
+
+0.0.5
+	Updated description in settings window
+	Doubled height of window
+	Made window wider
+	Added settings page to be able to disable mod, this will remove button from screen
+	Added column for mods, which when clicked on will show all patches for that mod
+
+0.0.6
+	Fixed problem when there were multiple exclusions in a ssingle mod
+	Updated documentation regarding filename of patch

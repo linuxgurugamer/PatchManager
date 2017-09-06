@@ -289,6 +289,7 @@ namespace PatchManager
         //
         void drawPatchWindow(int windowid)
         {
+            Log.Info("===================================================================================================");
             string lastModDisplayed = "";
             GUILayout.BeginHorizontal();
             fileSelectionScrollPosition = GUILayout.BeginScrollView(fileSelectionScrollPosition);
@@ -313,7 +314,7 @@ namespace PatchManager
                 Texture2D Image = null;
                 if (pi.icon != null && pi.icon.Length > 0)
                     Image = GameDatabase.Instance.GetTexture(pi.icon, false);
-                GUI.enabled = exclusionsOK(pi);
+                GUI.enabled = !expanded || exclusionsOK(pi);
 
                 if (Image == null)
                 {
@@ -350,7 +351,7 @@ namespace PatchManager
                 // End of Mod button display
 
 
-                GUI.enabled = true;
+                GUI.enabled = exclusionsOK(pi);
                 GUILayout.BeginVertical();
 
                 if (expanded && pi.modName == expandedMod )
@@ -382,6 +383,8 @@ namespace PatchManager
                 {
                     GUILayout.Label("\n\n", GUILayout.Width(WIDTH - 175 - 38 - 2));
                 }
+                GUI.enabled = true;
+
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
             }
@@ -543,6 +546,7 @@ namespace PatchManager
                         string oldName = getActivePatchName(pi, false);
                         if (!pi.installedWithMod)
                         {
+#if false
                             Log.Info("Checking for old name: " + oldName);
                             if (File.Exists(oldName))
                             {
@@ -558,7 +562,7 @@ namespace PatchManager
                                 Log.Info("Moving patch to correct location");
                                 System.IO.File.Move(altPath, activePatchName);
                             }
-
+#endif
                             Log.Info("Checking for file: " + activePatchName);
                             pi.enabled = File.Exists(activePatchName);
                         }
@@ -601,7 +605,7 @@ namespace PatchManager
             pi.fname = pi.srcPath.Substring(pi.srcPath.LastIndexOf('/') + 1);
 
             string s;
-            if (withModname && !pi.installedWithMod && settings.storeActivePatchesInPMFolder)
+            if (withModname && /*!pi.installedWithMod && */ settings.storeActivePatchesInPMFolder)
                 s = pi.destPath + "/" + pi.modName + "_" + pi.fname;
             else
                 s = pi.destPath + "/" + pi.fname;
@@ -668,12 +672,22 @@ namespace PatchManager
         {
             if (pi.exclusions == null || pi.exclusions.Count() == 0)
                 return true;
+            Log.Info("pi.patchName: " + pi.patchName);
+            Log.Info("pi.modName: " + pi.modName);
+            Log.Info("pi.exclusions: " + pi.exclusions);
             List<string> stringList = pi.exclusions.Split(',').ToList();
+            for (int i = 0; i < stringList.Count; i++)
+            {
+                var s = stringList[i];
+                s = pi.modName + "_" + s;
+                stringList[i] = s;
+            }
+#if falsae
             foreach (var s2 in stringList)
             {
                 Log.Info("s2: " + s2);
             }
-            Log.Info("pi.exclusions: " + pi.exclusions);
+#endif
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
