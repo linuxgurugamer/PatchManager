@@ -24,5 +24,8 @@
 	Added column for mods, which when clicked on will show all patches for that mod
 
 0.0.6
-	Fixed problem when there were multiple exclusions in a ssingle mod
+	Fixed problem when there were multiple exclusions in a single mod
 	Updated documentation regarding filename of patch
+
+0.0.7
+	Fixed problem where button was shown even when no patches available

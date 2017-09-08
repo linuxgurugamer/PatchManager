@@ -128,21 +128,21 @@ namespace PatchManager
             LoadAllPatches();
             settings.LoadSettings(CFG_DIR);
 
-            if (!settings.alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
-                return;
-
+          
 
             windowPosition = new Rect((Screen.width - WIDTH) / 2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
 
 
             if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
-            {
                 CreateButton();
-            }
+            
         }
 
         void CreateButton()
         {
+            if (!settings.alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
+                return;
+  
             Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
             Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
             GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
