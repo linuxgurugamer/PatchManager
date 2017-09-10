@@ -70,6 +70,13 @@ namespace PatchManager
                 UnityEngine.Debug.Log(PREFIX + msg);
             }
         }
+        public static void InfoAlways(String msg)
+        {
+            if (IsLogable(LEVEL.INFO))
+            {
+                UnityEngine.Debug.Log(PREFIX + msg);
+            }
+        }
 
         [ConditionalAttribute("DEBUG")]
         public static void Test(String msg)

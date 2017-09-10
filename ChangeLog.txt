@@ -29,3 +29,6 @@
 
 0.0.7
 	Fixed problem where button was shown even when no patches available
+
+0.0.8
+	Refactored code to deal with issues related to the pre-installed mods
