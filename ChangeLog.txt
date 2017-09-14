@@ -32,3 +32,7 @@
 
 0.0.8
 	Refactored code to deal with issues related to the pre-installed mods
+
+0.0.9
+	Added shutdown button
+	Added localization

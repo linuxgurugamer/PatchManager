@@ -6,13 +6,15 @@ using UnityEngine;
 using System.IO;
 using KSP.UI.Screens;
 
+using KSP.Localization;
+
 namespace PatchManager
 {
 
 
 
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
-    public class PatchManagerClass : MonoBehaviour
+    public partial class PatchManagerClass : MonoBehaviour
     {
         internal static PatchManagerClass Instance;
 
@@ -147,28 +149,33 @@ namespace PatchManager
         {
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            string s = "This overrides the function of the button being hidden if there are no patches due to dependencies";
+            //string s = "This overrides the function of the button being hidden if there are no patches due to dependencies";
+            string s = Localizer.Format("pm_overrideinfo");
             GUILayout.TextField(s);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            s = "This does not disble/enable the mod, that you can do in the standard settings:";
+            //s = "This does not disble/enable the mod, that you can do in the standard settings:";
+            s = Localizer.Format("pm_doesNot");
             GUILayout.TextField(s);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            settings.alwaysShow = GUILayout.Toggle(settings.alwaysShow, "Always show toolbar button");
+            //settings.alwaysShow = GUILayout.Toggle(settings.alwaysShow, "Always show toolbar button");
+            settings.alwaysShow = GUILayout.Toggle(settings.alwaysShow, Localizer.Format("pm_alwaysShow"));
             GUILayout.EndHorizontal();
             GUILayout.Space(25);
             GUILayout.BeginHorizontal();
-            s = "Disable this to store the active patches in the patch's parent mod folder";
+            //s = "Disable this to store the active patches in the patch's parent mod folder";
+            s = Localizer.Format("pm_disablethis");
             GUILayout.TextArea(s);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            settings.storeActivePatchesInPMFolder = GUILayout.Toggle(settings.storeActivePatchesInPMFolder, "Store active patches in PatchManager folder");
+            //settings.storeActivePatchesInPMFolder = GUILayout.Toggle(settings.storeActivePatchesInPMFolder, "Store active patches in PatchManager folder");
+            settings.storeActivePatchesInPMFolder = GUILayout.Toggle(settings.storeActivePatchesInPMFolder, Localizer.Format("pm_storeactive"));
             GUILayout.EndHorizontal();
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("OK", GUILayout.Width(60)))
+            if (GUILayout.Button(Localizer.Format("pm_ok"), GUILayout.Width(60)))
             {
                 showSettings = false;
                 settings.SaveSettings(CFG_DIR);
@@ -178,21 +185,45 @@ namespace PatchManager
             GUILayout.EndHorizontal();
             GUI.DragWindow();
         }
+        void doQuickShutdown()
+        {
+            //QExit.Instance.doShutdown = true;
+            doShutdown = true;
+        }
         //
         // Need to warn the user to restart KSP
         //
         void drawRestartWindow(int windowid)
         {
             CenterLine(" ");
-            CenterLine("The changes you just made by installing/uninstalling one or");
-            CenterLine("more patches will not take effect until the game is restarted");
+            //CenterLine("The changes you just made by installing/uninstalling one or");
+            //CenterLine("more patches will not take effect until the game is restarted");
+            CenterLine(Localizer.Format("pm_changesmade1"));
+            CenterLine(Localizer.Format("pm_changesmade2"));
             CenterLine(" ");
+            CenterLine(Localizer.Format("pm_changesmade3"));
+            CenterLine(Localizer.Format("pm_changesmade4"));
+
+            GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(" Acknowledged ", GUILayout.Width(150), GUILayout.Height(40)))
+            if (GUILayout.Button(Localizer.Format("pm_ack"), GUILayout.Width(150), GUILayout.Height(40)))
                 restartMsg = false;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(Localizer.Format("pm_shutdown"), GUILayout.Width(150), GUILayout.Height(40)))
+            {
+                restartMsg = false;
+                doQuickShutdown();
+            }
+                
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.FlexibleSpace();
             GUI.DragWindow();
         }
 
@@ -309,19 +340,19 @@ namespace PatchManager
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Apply All", GUILayout.Width(90)))
+            if (GUILayout.Button(Localizer.Format("pm_applyall"), GUILayout.Width(90)))
             {
                 ApplyAllChanges();
                 HideWindow();
 
             }
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Cancel", GUILayout.Width(90)))
+            if (GUILayout.Button(Localizer.Format("pm_cancel"), GUILayout.Width(90)))
             {
                 HideWindow();
             }
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Settings"))
+            if (GUILayout.Button(Localizer.Format("pm_settings")))
             {
                 showSettings = true;
             }
@@ -376,17 +407,17 @@ namespace PatchManager
                 if (!showSettings && visible)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawPatchWindow, "Patch Manager");
+                    windowPosition = GUILayout.Window(windowId, windowPosition, drawPatchWindow, Localizer.Format("pm_patchmanager"));
                 }
                 if (restartMsg)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawRestartWindow, "Restart Message");
+                    windowPosition = GUILayout.Window(windowId, windowPosition, drawRestartWindow, Localizer.Format("pm_restart"));
                 }
                 if (showSettings)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawSettingsWindow, "Patch Manager Settings");
+                    windowPosition = GUILayout.Window(windowId, windowPosition, drawSettingsWindow, Localizer.Format("pm_settingstitle"));
                 }
             }
         }
