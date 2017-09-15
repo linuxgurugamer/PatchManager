@@ -36,3 +36,6 @@
 0.0.9
 	Added shutdown button
 	Added localization
+		Added language file: en-us.cfg
+		Added language file: de-de.cfg, thanks @ThreePounds
+		added languag file: pt-br.cfg, thanks @monstrim

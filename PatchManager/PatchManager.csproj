@@ -69,11 +69,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Lang\es-es.cfg" />
-    <None Include="Lang\fr-fr.cfg" />
+    <None Include="Lang\de-de.cfg" />
     <None Include="Lang\en-us.cfg" />
-    <None Include="Lang\ja.cfg" />
-    <None Include="Lang\ru.cfg" />
+    <None Include="Lang\pt-br.cfg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
