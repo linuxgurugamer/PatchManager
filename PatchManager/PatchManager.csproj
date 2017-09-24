@@ -71,6 +71,7 @@
   <ItemGroup>
     <None Include="Lang\de-de.cfg" />
     <None Include="Lang\en-us.cfg" />
+    <None Include="Lang\es-es.cfg" />
     <None Include="Lang\pt-br.cfg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

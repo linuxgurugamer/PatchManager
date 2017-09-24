@@ -145,18 +145,24 @@ namespace PatchManager
             }
 
             fname = srcPath.Substring(srcPath.LastIndexOf('/') + 1);
-
             bool bd = Directory.Exists(destPath) || File.Exists(destPath);
-
-            if (bd)
+            if (installedWithMod)
             {
-                enabled = File.Exists(activePatchPath);
+                enabled = File.Exists(destPath + "/" + fname);
             }
             else
             {
-                enabled = false;
-                DirectoryInfo di = Directory.CreateDirectory(destPath);
-                // Shouldn't ever happen, but if it does, create the directory
+
+                if (bd)
+                {
+                    enabled = File.Exists(activePatchPath);
+                }
+                else
+                {
+                    enabled = false;
+                    DirectoryInfo di = Directory.CreateDirectory(destPath);
+                    // Shouldn't ever happen, but if it does, create the directory
+                }
             }
             toggle = false;
 
