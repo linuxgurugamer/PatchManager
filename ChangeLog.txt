@@ -39,3 +39,10 @@
 		Added language file: en-us.cfg
 		Added language file: de-de.cfg, thanks @ThreePounds
 		added languag file: pt-br.cfg, thanks @monstrim
+
+0.0.10
+	Added Spanish, thankst @swjr-swis
+	Fixed bug with patches which were installed with mods
+
+0.0.11
+	Updated for KSP 1.3.1

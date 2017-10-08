@@ -3,7 +3,7 @@
 
 rem Set variables here
 
-set H=R:\KSP_1.3.0_dev
+set H=R:\KSP_1.3.1_dev
 set GAMEDIR=PatchManager
 set LICENSE=License.txt
 set README=README.md
