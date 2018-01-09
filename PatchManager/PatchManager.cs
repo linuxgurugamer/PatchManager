@@ -382,7 +382,8 @@ namespace PatchManager
                     {
                         Log.Info("Activating patch: " + pi.activePatchName);
                         Log.Info("activePatchPath: " + pi.activePatchPath + ", inactivePatchPath: " + pi.inactivePatchPath);
-                        File.Copy(pi.inactivePatchPath, pi.activePatchPath);
+                        if (System.IO.File.Exists(pi.inactivePatchPath))
+                            File.Copy(pi.inactivePatchPath, pi.activePatchPath);
                     }
                 }
             }
