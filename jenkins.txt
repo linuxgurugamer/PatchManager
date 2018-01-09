@@ -27,10 +27,10 @@
 1:PatchManager, PatchManager.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:KerbalHotSeat,PatchManager/PatchManager.csproj,PatchManager.version,GameData/PatchManager/Plugins
+2:PatchManager,PatchManager/PatchManager.csproj,PatchManager.version,GameData/PatchManager/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:KerbalHotSeat.version,GameData/PatchManager
+3:PatchManager.version,GameData/PatchManager
 #3:LICENSE.md,GameData/KerbalHotSeat
 #3:README.md,GameData/KerbalHotSeat
 
