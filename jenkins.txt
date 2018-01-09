@@ -30,7 +30,7 @@
 2:KerbalHotSeat,PatchManager/PatchManager.csproj,PatchManager.version,GameData/PatchManager/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:KerbalHotSeat.version,GameData/KerbalHotSeat
+3:KerbalHotSeat.version,GameData/PatchManager
 #3:LICENSE.md,GameData/KerbalHotSeat
 #3:README.md,GameData/KerbalHotSeat
 
