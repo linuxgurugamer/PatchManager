@@ -49,3 +49,7 @@
 
 0.0.12
 	Fixed nullref if patch file is missing
+
+0.0.13
+	Fixed problem where exclusions weren't working if modname had spaces
+	Added warning message if patch file is missing (when activating a new patch)

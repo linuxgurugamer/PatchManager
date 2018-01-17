@@ -384,6 +384,8 @@ namespace PatchManager
                         Log.Info("activePatchPath: " + pi.activePatchPath + ", inactivePatchPath: " + pi.inactivePatchPath);
                         if (System.IO.File.Exists(pi.inactivePatchPath))
                             File.Copy(pi.inactivePatchPath, pi.activePatchPath);
+                        else
+                            ScreenMessages.PostScreenMessage("Patch file: " + pi.inactivePatchPath + " missing", 5);
                     }
                 }
             }
@@ -490,38 +492,43 @@ namespace PatchManager
         bool exclusionsOK(PatchInfo pi)
         {
             if (pi.exclusions == null || pi.exclusions.Count() == 0)
+            {
+                Log.Info("No exclusions");
                 return true;
-            //Log.Info("pi.patchName: " + pi.patchName);
-            //Log.Info("pi.modName: " + pi.modName);
-            //Log.Info("pi.exclusions: " + pi.exclusions);
+            }
+            Log.Info("pi.patchName: " + pi.patchName);
+            Log.Info("pi.modName: " + pi.modName);
+            Log.Info("pi.exclusions: " + pi.exclusions);
             List<string> stringList = pi.exclusions.Split(',').ToList();
             for (int i = 0; i < stringList.Count; i++)
             {
                 var s = stringList[i];
                 s = pi.modName + "_" + s;
+                s = s.Replace(' ', '_');
                 stringList[i] = s;
+                Log.Info("stringlist[" + i + "]: " + s);
             }
 
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
                 string s = pi.exclusionPatchName;
-                //Log.Info("Checking Exclusion: " + s + "   enabled: " + pi.enabled.ToString() + "   toggle: " + pi.toggle.ToString());
+                Log.Info("Checking Exclusion: " + s + "   enabled: " + pi.enabled.ToString() + "   toggle: " + pi.toggle.ToString());
 
                 if ((pi.enabled && !pi.toggle) || (!pi.enabled && pi.toggle))
                 {
                     if (stringList.Contains(s))
                     {
-                        //Log.Info("exclusion found");
+                        Log.Info("exclusion found");
                         return false;
                     }
                     else
                     {
-                        //Log.Info("stringList does NOT contain [" + s + "]");
+                        Log.Info("stringList does NOT contain [" + s + "]");
                     }
                 }
             }
-
+            Log.Info("No exclusion found");
             return true;
         }
 
