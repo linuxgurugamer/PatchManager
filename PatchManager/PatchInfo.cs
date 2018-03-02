@@ -99,10 +99,12 @@ namespace PatchManager
                 }
                 else
                 {
-                    if (!installedWithMod)
-                        s = PatchManagerClass.Instance.DEFAULT_PATCH_DIRECTORY + "/" + fname;
-                    else
-                        s = "GameData/" + modName + "/PatchManager/ActiveMMPatches/" + fname;
+                    //if (!installedWithMod)
+                    //s = PatchManagerClass.Instance.DEFAULT_PATCH_DIRECTORY + "/" + fname;
+                    //else
+                    s = "GameData/" + srcPath.Replace("PluginData", "ActiveMMPatches");
+
+                    //s = "GameData/" + modName + "/PatchManager/ActiveMMPatches/" + fname;
                 }
                 s = s.Replace(' ', '_');
 

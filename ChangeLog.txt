@@ -1,12 +1,45 @@
-0.0.1.4
-	Initial release
+0.0.14
+	Added warning message if patch file is missing (when deactivating an existing patch)
+	Fixed location of ActiveMMPatches (was assuming it was in  modname/PatchManager/ActiveMMPatches)
+	Added some minor verbage to the log file to help mod authors in debugging
 
-0.0.2
-	Updated active file names to avoid name collisions
-	Added code to rename existing files, if any
+0.0.13
+	Fixed problem where exclusions weren't working if modname had spaces
+	Added warning message if patch file is missing (when activating a new patch)
 
-0.0.3
-	Added ability to have exclusions of other patch files
+0.0.12
+	Fixed nullref if patch file is missing
+
+0.0.11
+	Updated for KSP 1.3.1
+
+0.0.10
+	Added Spanish, thankst @swjr-swis
+	Fixed bug with patches which were installed with mods
+
+0.0.9
+	Added shutdown button
+	Added localization
+		Added language file: en-us.cfg
+		Added language file: de-de.cfg, thanks @ThreePounds
+		added languag file: pt-br.cfg, thanks @monstrim
+
+0.0.8
+	Refactored code to deal with issues related to the pre-installed mods
+
+0.0.7
+	Fixed problem where button was shown even when no patches available
+
+0.0.6
+	Fixed problem when there were multiple exclusions in a single mod
+	Updated documentation regarding filename of patch
+
+0.0.5
+	Updated description in settings window
+	Doubled height of window
+	Made window wider
+	Added settings page to be able to disable mod, this will remove button from screen
+	Added column for mods, which when clicked on will show all patches for that mod
 
 0.0.4
 	Fixed bug where path to KSP directory has spaces
@@ -16,40 +49,36 @@
 	Added code to move active patches to the correct directory at load time and if it is changed 
 	Replaced settings page with new setting window, because these options are global to all games, not specific saves
 
-0.0.5
-	Updated description in settings window
-	Doubled height of window
-	Made window wider
-	Added settings page to be able to disable mod, this will remove button from screen
-	Added column for mods, which when clicked on will show all patches for that mod
+0.0.3
+	Added ability to have exclusions of other patch files
 
-0.0.6
-	Fixed problem when there were multiple exclusions in a single mod
-	Updated documentation regarding filename of patch
+0.0.2
+	Updated active file names to avoid name collisions
+	Added code to rename existing files, if any
 
-0.0.7
-	Fixed problem where button was shown even when no patches available
+0.0.1.4
+	Initial release
 
-0.0.8
-	Refactored code to deal with issues related to the pre-installed mods
 
-0.0.9
-	Added shutdown button
-	Added localization
-		Added language file: en-us.cfg
-		Added language file: de-de.cfg, thanks @ThreePounds
-		added languag file: pt-br.cfg, thanks @monstrim
 
-0.0.10
-	Added Spanish, thankst @swjr-swis
-	Fixed bug with patches which were installed with mods
 
-0.0.11
-	Updated for KSP 1.3.1
 
-0.0.12
-	Fixed nullref if patch file is missing
 
-0.0.13
-	Fixed problem where exclusions weren't working if modname had spaces
-	Added warning message if patch file is missing (when activating a new patch)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
