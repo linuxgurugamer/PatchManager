@@ -1,3 +1,6 @@
+0.0.15
+	Recompiled for 1.4.1
+
 0.0.14
 	Added warning message if patch file is missing (when deactivating an existing patch)
 	Fixed location of ActiveMMPatches (was assuming it was in  modname/PatchManager/ActiveMMPatches)
