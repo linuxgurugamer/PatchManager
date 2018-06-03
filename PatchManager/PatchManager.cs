@@ -8,10 +8,21 @@ using KSP.UI.Screens;
 
 using KSP.Localization;
 
+using ClickThroughFix;
+using ToolbarControl_NS;
+
+
 namespace PatchManager
 {
 
-
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    public class RegisterToolbar : MonoBehaviour
+    {
+        void Start()
+        {
+            ToolbarControl.RegisterMod(PatchManagerClass.MODID, PatchManagerClass.MODNAME);
+        }
+    }
 
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public partial class PatchManagerClass : MonoBehaviour
@@ -25,7 +36,7 @@ namespace PatchManager
         string CFG_DIR;
         public static List<String> installedMods = null;
 
-        private ApplicationLauncherButton Button;
+        //private ApplicationLauncherButton Button;
         bool visible = false;
         bool restartMsg = false;
         Rect windowPosition;
@@ -53,15 +64,29 @@ namespace PatchManager
             if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
                 CreateButton();
         }
+        ToolbarControl toolbarControl;
+        internal const string MODID = "Patchmanger_NS";
+        internal const string MODNAME = "Patch Manager";
 
         void CreateButton()
         {
             if (!settings.alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
                 return;
-  
+#if false
             Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
             Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
             GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
+#endif
+            toolbarControl = gameObject.AddComponent<ToolbarControl>();
+            toolbarControl.AddToAllToolbars(onTrue, onFalse,
+                ApplicationLauncher.AppScenes.SPACECENTER ,
+                MODID,
+                "patchManagerButton﻿",
+                "PatchManager/Resources/PatchManager-38",
+                "PatchManager/Resources/PatchManager-24",
+                MODNAME
+            );
+
         }
 
         public void onTrue()
@@ -84,20 +109,27 @@ namespace PatchManager
 
         private void Destroy(GameScenes scene)
         {
+
             OnDestroy();
+
         }
 
         public void OnDestroy()
         {
-            if (Button != null)
+            if (toolbarControl != null)
             {
+                toolbarControl.OnDestroy();
+                Destroy(toolbarControl);
+                toolbarControl = null;
+#if false
                 ApplicationLauncher.Instance.RemoveModApplication(Button);
                 GameEvents.onGUIApplicationLauncherUnreadifying.Remove(Destroy);
                 Button = null;
+#endif
             }
         }
 
-        #region ButtonStyles
+#region ButtonStyles
         static GUIStyle bodyButtonStyle = new GUIStyle(HighLogic.Skin.button)
         {
             alignment = TextAnchor.MiddleCenter,
@@ -127,12 +159,13 @@ namespace PatchManager
             fontStyle = FontStyle.Bold
         };
 
-        #endregion
+#endregion
 
         void HideWindow()
         {
             visible = false;
-            Button.SetFalse();
+            //Button.SetFalse();
+            toolbarControl.SetFalse(true);
         }
 
         void CenterLine(string msg)
@@ -403,9 +436,9 @@ namespace PatchManager
 
         private void LateUpdate()
         {
-            if (Button == null && HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
+            if (toolbarControl == null && HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
                 CreateButton();
-            if (Button != null && !HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
+            if (toolbarControl != null && !HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
                 OnDestroy();
         }
 
@@ -418,18 +451,19 @@ namespace PatchManager
             {
                 if (!showSettings && visible)
                 {
-                    int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawPatchWindow, Localizer.Format("pm_patchmanager"));
+                    int windowId = GUIUtility.GetControlID(FocusType.Passive);
+                    
+                    windowPosition = ClickThruBlocker.GUILayoutWindow(windowId, windowPosition, drawPatchWindow, Localizer.Format("pm_patchmanager"));
                 }
                 if (restartMsg)
                 {
-                    int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawRestartWindow, Localizer.Format("pm_restart"));
+                    int windowId = GUIUtility.GetControlID(FocusType.Passive);
+                    windowPosition = ClickThruBlocker.GUILayoutWindow(windowId, windowPosition, drawRestartWindow, Localizer.Format("pm_restart"));
                 }
                 if (showSettings)
                 {
-                    int windowId = GUIUtility.GetControlID(FocusType.Native);
-                    windowPosition = GUILayout.Window(windowId, windowPosition, drawSettingsWindow, Localizer.Format("pm_settingstitle"));
+                    int windowId = GUIUtility.GetControlID(FocusType.Passive);
+                    windowPosition = ClickThruBlocker.GUILayoutWindow(windowId, windowPosition, drawSettingsWindow, Localizer.Format("pm_settingstitle"));
                 }
             }
         }

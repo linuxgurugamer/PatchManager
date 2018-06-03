@@ -67,7 +67,7 @@ namespace PatchManager
                     StopCoroutine(coroutineTryExit);
                     coroutineTryExit = null;
                 }
-                saveDone = false;
+                //saveDone = false;
                 if (value)
                 {
                     Log.Info("IsTryExit, starting tryExit() coroutine");
@@ -78,7 +78,7 @@ namespace PatchManager
         }
 
 
-        bool saveDone = false;
+        //bool saveDone = false;
         bool CanSavegame
         {
             get
@@ -127,7 +127,7 @@ namespace PatchManager
             {
                 if (GamePersistence.SaveGame("persistent", HighLogic.SaveFolder, SaveMode.OVERWRITE) != string.Empty)
                 {
-                    saveDone = true;
+                    //saveDone = true;
                     ScreenMessages.PostScreenMessage(Localizer.Format("pm_gameSaved", MOD), 5);
                     MyLog("Game saved.", "QExit");
                 }

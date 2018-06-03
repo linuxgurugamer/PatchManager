@@ -1,3 +1,7 @@
+0.0.16
+	Added support for Toolbarcontroller
+	Added support for ClickthroughBlocker
+
 0.0.15
 	Recompiled for 1.4.1
 
