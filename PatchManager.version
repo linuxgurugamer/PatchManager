@@ -1,6 +1,6 @@
 {
   "NAME": "PatchManager",
-   "URL": "https://raw.githubusercontent.com/linuxgurugamer/PatchManager/master/PatchManager.version",
+   "URL": "http://ksp.spacetux.net/avc/PatchManager",
   "DOWNLOAD" : "https://github.com/linuxgurugamer/PatchManager/releases",
   "GITHUB" :
   {
@@ -12,7 +12,7 @@
     "MAJOR": 0,
     "MINOR": 0,
     "PATCH": 16,
-    "BUILD": 1
+    "BUILD": 2
   },
   "KSP_VERSION": {
     "MAJOR": 1,
