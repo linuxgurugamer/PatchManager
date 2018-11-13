@@ -1,3 +1,6 @@
+0.0.16.3
+	Removed extra URL line from .version
+
 0.0.16.2
 	Version bump to fix .version file
 
