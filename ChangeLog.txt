@@ -1,3 +1,10 @@
+ChangeLog
+
+0.0.17
+	Added InstallChecker
+	Updated AssemblyVersion.tt
+	Updated for KSP 1.8
+
 0.0.16.3
 	Removed extra URL line from .version
 

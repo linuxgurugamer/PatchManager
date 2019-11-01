@@ -1,7 +1,7 @@
 
 @echo off
 
-set H=R:\KSP_1.6.1_dev
+set H=%KSPDIR%
 set GAMEDIR=PatchManager
 
 echo %H%
