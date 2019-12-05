@@ -1,5 +1,8 @@
 ChangeLog
 
+0.0.17.1
+	Fixed initialization of vars
+
 0.0.17
 	Added InstallChecker
 	Updated AssemblyVersion.tt

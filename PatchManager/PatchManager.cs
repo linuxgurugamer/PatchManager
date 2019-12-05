@@ -31,7 +31,7 @@ namespace PatchManager
 
         const string CONFIG_NODENAME = "PatchManager";
 
-        string KSP_DIR = KSPUtil.ApplicationRootPath;
+        string KSP_DIR;
         internal string DEFAULT_PATCH_DIRECTORY;
         string CFG_DIR;
         public static List<String> installedMods = null;
@@ -50,6 +50,11 @@ namespace PatchManager
         internal Settings settings = new Settings();
 
         PatchInfo pi;
+
+        void Awake()
+        {
+            KSP_DIR = KSPUtil.ApplicationRootPath;
+        }
 
         public void Start()
         {
