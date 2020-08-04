@@ -1,5 +1,8 @@
 ChangeLog
 
+0.0.17.2
+	Fixed non-selected mods expanding display with whitespace
+
 0.0.17.1
 	Fixed initialization of vars
 

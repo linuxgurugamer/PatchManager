@@ -36,13 +36,13 @@ namespace PatchManager
         string CFG_DIR;
         public static List<String> installedMods = null;
 
-        //private ApplicationLauncherButton Button;
         bool visible = false;
         bool restartMsg = false;
         Rect windowPosition;
         const int WIDTH = 900;
         const int HEIGHT = 600;
-        Vector2 fileSelectionScrollPosition = new Vector2();
+
+        Vector2 fileSelectionScrollPosition;
 
         static List<PatchInfo> availablePatches = new List<PatchInfo>();
         static List<String> installedPatches = new List<String>();
@@ -54,6 +54,7 @@ namespace PatchManager
         void Awake()
         {
             KSP_DIR = KSPUtil.ApplicationRootPath;
+            fileSelectionScrollPosition = new Vector2();
         }
 
         public void Start()
@@ -65,10 +66,41 @@ namespace PatchManager
             settings.LoadSettings(CFG_DIR);
 
             windowPosition = new Rect((Screen.width - WIDTH) / 2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
-            
+
             if (HighLogic.CurrentGame.Parameters.CustomParams<PM>().EnabledForSave)
                 CreateButton();
+
+
+            bodyButtonStyle = new GUIStyle(HighLogic.Skin.button)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold
+            };
+
+            bodyButtonStyleGreen = new GUIStyle(HighLogic.Skin.button)
+            {
+                normal =
+            {
+                textColor = Color.green
+            },
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold
+            };
+
+            bodyButtonStyleRed = new GUIStyle(HighLogic.Skin.button)
+            {
+                normal =
+            {
+                textColor = Color.red
+            },
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 12,
+                fontStyle = FontStyle.Bold
+            };
         }
+
         ToolbarControl toolbarControl;
         internal const string MODID = "Patchmanger_NS";
         internal const string MODNAME = "Patch Manager";
@@ -84,7 +116,7 @@ namespace PatchManager
 #endif
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(onTrue, onFalse,
-                ApplicationLauncher.AppScenes.SPACECENTER ,
+                ApplicationLauncher.AppScenes.SPACECENTER,
                 MODID,
                 "patchManagerButton﻿",
                 "PatchManager/Resources/PatchManager-38",
@@ -114,9 +146,7 @@ namespace PatchManager
 
         private void Destroy(GameScenes scene)
         {
-
             OnDestroy();
-
         }
 
         public void OnDestroy()
@@ -126,45 +156,17 @@ namespace PatchManager
                 toolbarControl.OnDestroy();
                 Destroy(toolbarControl);
                 toolbarControl = null;
-#if false
-                ApplicationLauncher.Instance.RemoveModApplication(Button);
-                GameEvents.onGUIApplicationLauncherUnreadifying.Remove(Destroy);
-                Button = null;
-#endif
             }
         }
 
-#region ButtonStyles
-        static GUIStyle bodyButtonStyle = new GUIStyle(HighLogic.Skin.button)
-        {
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 12,
-            fontStyle = FontStyle.Bold
-        };
+        #region ButtonStyles
+        static GUIStyle bodyButtonStyle;
 
-        static GUIStyle bodyButtonStyleGreen = new GUIStyle(HighLogic.Skin.button)
-        {
-            normal =
-            {
-                textColor = Color.green
-            },
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 12,
-            fontStyle = FontStyle.Bold
-        };
+        static GUIStyle bodyButtonStyleGreen;
 
-        static GUIStyle bodyButtonStyleRed = new GUIStyle(HighLogic.Skin.button)
-        {
-            normal =
-            {
-                textColor = Color.red
-            },
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 12,
-            fontStyle = FontStyle.Bold
-        };
+        static GUIStyle bodyButtonStyleRed;
 
-#endregion
+        #endregion
 
         void HideWindow()
         {
@@ -257,7 +259,7 @@ namespace PatchManager
                 restartMsg = false;
                 doQuickShutdown();
             }
-                
+
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -281,9 +283,11 @@ namespace PatchManager
             for (int i = 0; i < availablePatches.Count(); i++)
             {
                 pi = availablePatches[i];
-                //Log.Info("i: " + i.ToString() + ",  modname: " + pi.modName);
+                //Log.Info("i: " + i.ToString() + ",  modname: " + pi.modName + ", lastModDisplayed: " + lastModDisplayed);
 
                 if (!expanded && pi.modName == lastModDisplayed)
+                    continue;
+                if (expanded && pi.modName != expandedMod && expandedMod != "" && pi.modName == lastModDisplayed)
                     continue;
 
                 GUILayout.BeginHorizontal();
@@ -324,7 +328,7 @@ namespace PatchManager
                             expanded = false;
                         else
                             if (!expanded)
-                                expanded = !expanded;
+                            expanded = !expanded;
                         expandedMod = pi.modName;
                     }
                 }
@@ -338,7 +342,7 @@ namespace PatchManager
                 GUI.enabled = exclusionsOK(pi);
                 GUILayout.BeginVertical();
 
-                if (expanded && pi.modName == expandedMod )
+                if (expanded && pi.modName == expandedMod)
                 {
                     if (pi.enabled)
                     {
@@ -360,8 +364,8 @@ namespace PatchManager
                     }
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical();
-                   
-                    GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175*2 - 38 - 2));
+
+                    GUILayout.Label(pi.longDescr + "\n" + pi.author + "\n", GUILayout.Width(WIDTH - 175 * 2 - 38 - 2));
                 }
                 else
                 {
@@ -457,7 +461,7 @@ namespace PatchManager
                 if (!showSettings && visible)
                 {
                     int windowId = GUIUtility.GetControlID(FocusType.Passive);
-                    
+
                     windowPosition = ClickThruBlocker.GUILayoutWindow(windowId, windowPosition, drawPatchWindow, Localizer.Format("pm_patchmanager"));
                 }
                 if (restartMsg)
@@ -487,7 +491,7 @@ namespace PatchManager
                 foreach (var n in availableNodes)
                 {
                     PatchInfo pi = new PatchInfo(n);
-                    
+
                     if (pi.enabled)
                         installedPatches.Add(pi.activePatchName);
                     if (dependenciesOK(pi))
