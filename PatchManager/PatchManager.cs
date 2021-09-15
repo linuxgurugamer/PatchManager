@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using System.IO;
 using KSP.UI.Screens;
@@ -109,11 +108,7 @@ namespace PatchManager
         {
             if (!settings.alwaysShow && (availablePatches == null || availablePatches.Count() == 0))
                 return;
-#if false
-            Texture2D Image = GameDatabase.Instance.GetTexture("PatchManager/Resources/PatchManager", false);
-            Button = ApplicationLauncher.Instance.AddModApplication(onTrue, onFalse, null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER, Image);
-            GameEvents.onGUIApplicationLauncherUnreadifying.Add(Destroy);
-#endif
+
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(onTrue, onFalse,
                 ApplicationLauncher.AppScenes.SPACECENTER,
@@ -487,7 +482,7 @@ namespace PatchManager
             if (availableNodes.Count() > 0)
             {
                 //load
-                Log.Info("PatchManager loaded configs, count: " + availableNodes.Count().ToString());
+                Log.InfoAlways("PatchManager loaded configs, count: " + availableNodes.Count().ToString());
                 foreach (var n in availableNodes)
                 {
                     PatchInfo pi = new PatchInfo(n);
@@ -502,7 +497,7 @@ namespace PatchManager
             }
             else
             {
-                Log.Info("PatchManager no loaded configs");
+                Log.InfoAlways("PatchManager no loaded configs");
             }
         }
 

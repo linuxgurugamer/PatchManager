@@ -1,5 +1,10 @@
 ChangeLog
 
+0.0.17.3 
+	Added AssemblyFileVersion
+	Updated version file for 1.12
+	Added log file output listing total configs loaded
+
 0.0.17.2
 	Fixed non-selected mods expanding display with whitespace
 
