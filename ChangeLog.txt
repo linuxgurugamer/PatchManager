@@ -1,5 +1,9 @@
 ChangeLog
 
+0.0.17.4
+	Thanks to forum user @HebaruSan for this:
+		Fixed minor syntax error in the French translation
+
 0.0.17.3 
 	Added AssemblyFileVersion
 	Updated version file for 1.12
