@@ -1,5 +1,8 @@
 ChangeLog
 
+0.0.17.5
+	Thanks to github user @vinix38 for updating the French translation
+
 0.0.17.4
 	Thanks to forum user @HebaruSan for this:
 		Fixed minor syntax error in the French translation
