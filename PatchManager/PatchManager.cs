@@ -62,7 +62,7 @@ namespace PatchManager
             DEFAULT_PATCH_DIRECTORY = "GameData/PatchManager/ActiveMMPatches";
             CFG_DIR = "GameData/PatchManager/PluginData";
             LoadAllPatches();
-            settings.LoadSettings(CFG_DIR);
+            settings.LoadSettings(KSPUtil.ApplicationRootPath + CFG_DIR);
 
             windowPosition = new Rect((Screen.width - WIDTH) / 2, (Screen.height - HEIGHT) / 2, WIDTH, HEIGHT);
 
@@ -113,7 +113,7 @@ namespace PatchManager
             toolbarControl.AddToAllToolbars(onTrue, onFalse,
                 ApplicationLauncher.AppScenes.SPACECENTER,
                 MODID,
-                "patchManagerButton﻿",
+                "patchManagerButton",
                 "PatchManager/Resources/PatchManager-38",
                 "PatchManager/Resources/PatchManager-24",
                 MODNAME
@@ -213,7 +213,7 @@ namespace PatchManager
             if (GUILayout.Button(Localizer.Format("pm_ok"), GUILayout.Width(60)))
             {
                 showSettings = false;
-                settings.SaveSettings(CFG_DIR);
+                settings.SaveSettings(KSPUtil.ApplicationRootPath + CFG_DIR);
                 CheckPatchLocations();
             }
             GUILayout.FlexibleSpace();
