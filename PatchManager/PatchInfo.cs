@@ -147,10 +147,10 @@ namespace PatchManager
             }
 
             fname = srcPath.Substring(srcPath.LastIndexOf('/') + 1);
-            bool bd = Directory.Exists(destPath) || File.Exists(destPath);
+            bool bd = Directory.Exists(KSPUtil.ApplicationRootPath + destPath) || File.Exists(KSPUtil.ApplicationRootPath + destPath);
             if (installedWithMod)
             {
-                enabled = File.Exists(destPath + "/" + fname);
+                enabled = File.Exists(KSPUtil.ApplicationRootPath + destPath + "/" + fname);
             }
             else
             {
@@ -162,7 +162,7 @@ namespace PatchManager
                 else
                 {
                     enabled = false;
-                    DirectoryInfo di = Directory.CreateDirectory(destPath);
+                    DirectoryInfo di = Directory.CreateDirectory(KSPUtil.ApplicationRootPath + destPath);
                     // Shouldn't ever happen, but if it does, create the directory
                 }
             }
