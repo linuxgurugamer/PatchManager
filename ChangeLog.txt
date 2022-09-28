@@ -1,5 +1,9 @@
 ChangeLog
 
+0.0.17.6
+	Thanks for @HebaruSan for this fix:
+		Fixed a couple of other places where relative paths where used to save settings outside game folder
+
 0.0.17.5
 	Thanks to github user @vinix38 for updating the French translation
 
