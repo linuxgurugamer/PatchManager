@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using KSP.Localization;
 
 
 namespace PatchManager
@@ -67,8 +68,8 @@ namespace PatchManager
         public override int SectionOrder { get { return 2; } }
         public override bool HasPresets { get { return true; } }
 
+        [GameParameters.CustomParameterUI("#pm_modenabled")]
 
-        [GameParameters.CustomParameterUI("Mod Enabled")]
         public bool EnabledForSave = true;      // is enabled for this save file
 
 
